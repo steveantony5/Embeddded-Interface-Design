@@ -24,12 +24,12 @@ def get_sensor_data():
     
 def sensor_periodic():
     # create a database connection
-    db = dbhandler.create_connection()
+    db_dump = dbhandler.create_connection()
 
     #project_table = CREATE TABLE IF NOT EXISTS sensordata(temperature float, humidity float, ttime TIME)
 
     # Create table
-    dbhandler.create_table(db)
+    dbhandler.create_table(db_dump)
 
     # Try to grab a sensor reading.  Use the read_retry method which will retry up
     # to 15 times to get a sensor reading (waiting 2 seconds between each retry).
@@ -37,8 +37,8 @@ def sensor_periodic():
     temperature = temperature * 9/5.0 + 32
     my_time = int(time.time())
     data = (temperature, humidity, my_time)
-    dbhandler.insert_data(db, data)
-    db.commit()
+    dbhandler.insert_data(db_dump, data)
+    db_dump.commit()
         
 
     # Note that sometimes you won't get a reading and
@@ -50,7 +50,7 @@ def sensor_periodic():
     else:
             print('Failed to get reading. Try again!')
             sys.exit(1)
-    db.close()
+    db_dump.close()
 
 
 #inheriting mywindow class from the class QDialog
@@ -82,7 +82,7 @@ class mywindow(QtWidgets.QDialog):
 
     def refresh(self):
         print("Display update")
-        read_data_list = sensorpoll.get_sensor_data()
+        read_data_list = get_sensor_data()
         
         temp = read_data_list[0]
         humidity = read_data_list[1]
@@ -106,6 +106,7 @@ class mywindow(QtWidgets.QDialog):
         print(database_temp)
         db.close()
         
+                
         temp, time = map(list, zip(*database_temp))
         if self.ui.checkBox_temp.isChecked():
             print("Celcius display")
@@ -116,6 +117,7 @@ class mywindow(QtWidgets.QDialog):
             
         plotWidget = pg.plot(title="Temperature history")
         plotWidget.plot(time, temp)
+        
         
     def show_hum_graph(self):
         db = dbhandler.create_connection()
@@ -133,7 +135,7 @@ class mywindow(QtWidgets.QDialog):
     def periodic_task(self):
         sensor_periodic()
         
-        read_data_list = sensorpoll.get_sensor_data()
+        read_data_list = get_sensor_data()
         temp = read_data_list[0]
         humidity = read_data_list[1]
         timestamp = read_data_list[2]

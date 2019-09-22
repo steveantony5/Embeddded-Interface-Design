@@ -27,8 +27,8 @@ def create_table(conn):
     """
     try:
         c = conn.cursor()
-        c.execute("DROP TABLE sensordata")
-        c.execute("CREATE TABLE IF NOT EXISTS sensordata(temperature float, humidity float, ttime INTEGER)")
+        #c.execute("DROP TABLE sensordata")
+        c.execute("CREATE TABLE IF NOT EXISTS sensordata(id int NOT NULL AUTO_INCREMENT, temperature float, humidity float, ttime INTEGER, PRIMARY KEY (id))")
     except Error as e:
         print(e)
  
@@ -47,14 +47,14 @@ def insert_data(conn, data):
     
 def read_temperature(conn):
     cur = conn.cursor()
-    cur.execute("select temperature,ttime from sensordata")
+    cur.execute("select temperature,ttime from sensordata order by id desc limit 10")
     output = cur.fetchall()
     
     return output
     
 def read_humidity(conn):
     cur = conn.cursor()
-    cur.execute("select humidity,ttime from sensordata")
+    cur.execute("select humidity,ttime from sensordata order by id desc limit 10")
     output = cur.fetchall()
     
     return output
