@@ -11,18 +11,20 @@ import time
 
 import Adafruit_DHT
 
-
+'''Sensor pins where the temperature sensor is connected'''
 sensor = 22
 pin = 22
 
 def get_sensor_data():
+    '''get_sensor_data : gets the immediate reading from sensor'''
     h_data, t_data = Adafruit_DHT.read_retry(sensor, pin)
     t_data = t_data * 9/5.0 + 32
     current_time = int(time.time())
     data = [t_data, h_data, current_time]
     return data
-    
+
 def sensor_periodic():
+    '''sensor_periodic : the 15 sec periodic task which reads sensor data'''
     # create a database connection
     db_dump = dbhandler.create_connection()
 
@@ -31,20 +33,14 @@ def sensor_periodic():
     # Create table
     dbhandler.create_table(db_dump)
 
-    # Try to grab a sensor reading.  Use the read_retry method which will retry up
-    # to 15 times to get a sensor reading (waiting 2 seconds between each retry).
     humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
     temperature = temperature * 9/5.0 + 32
     my_time = int(time.time())
     data = (temperature, humidity, my_time)
     dbhandler.insert_data(db_dump, data)
     db_dump.commit()
-        
 
-    # Note that sometimes you won't get a reading and
-    # the results will be null (because Linux can't
-    # guarantee the timing of calls to read the sensor).
-    # If this happens try again!
+
     if humidity is not None and temperature is not None:
             print('Temp={0:0.1f}*  Humidity={1:0.1f}%'.format(temperature, humidity))
     else:
@@ -56,34 +52,36 @@ def sensor_periodic():
 #inheriting mywindow class from the class QDialog
 class mywindow(QtWidgets.QDialog):
     def __init__(self):
+        '''Constructor for the class'''
         super(mywindow, self).__init__() #initiating the parent class
-        self.ui = Ui_Dialog() 
+        self.ui = Ui_Dialog()
         self.ui.setupUi(self) #calling the function generated in the .ui
 
         self._update_timer = QtCore.QTimer()
         self._update_timer.timeout.connect(self.periodic_task)
         self._update_timer.start(15000) # milliseconds
-        
+
         self.ui.lineedit_maxtemp.setText("30");
         self.ui.lineedit_maxhum.setText("18");
-        
-        
 
-        self.ui.pushButton_refresh.clicked.connect(self.refresh) 
 
-        self.ui.pushButton_tempgraph.clicked.connect(self.show_temp_graph) 
 
-        self.ui.pushButton_humgraph.clicked.connect(self.show_hum_graph) 
-        
-        
+        self.ui.pushButton_refresh.clicked.connect(self.refresh)
+
+        self.ui.pushButton_tempgraph.clicked.connect(self.show_temp_graph)
+
+        self.ui.pushButton_humgraph.clicked.connect(self.show_hum_graph)
+
+
 
 
 
 
     def refresh(self):
+        '''refresh : function which updates the status line with immediate reading when refresh button is pressed'''
         print("Display update")
         read_data_list = get_sensor_data()
-        
+
         temp = read_data_list[0]
         humidity = read_data_list[1]
         timestamp = read_data_list[2]
@@ -99,42 +97,45 @@ class mywindow(QtWidgets.QDialog):
         self.ui.lcd_humidity.repaint()
 
     def show_temp_graph(self):
+        '''show_temp_graph : function to display graph of last 10 temperature reading'''
         db = dbhandler.create_connection()
         print("Display graph for temperature")
         database_temp = dbhandler.read_temperature(db)
         database_temp = [list(row) for row in database_temp]
         print(database_temp)
         db.close()
-        
-                
+
+
         temp, time = map(list, zip(*database_temp))
         if self.ui.checkBox_temp.isChecked():
             print("Celcius display")
             new_temp = [((t -  32) * 5/9) for t in temp]
             temp = new_temp.copy()
             print(temp)
-            
-            
+
+
         plotWidget = pg.plot(title="Temperature history")
         plotWidget.plot(time, temp)
-        
-        
+
+
     def show_hum_graph(self):
+        '''show_hum_graph : function to display graph of last 10 humidity reading'''
         db = dbhandler.create_connection()
         print("Display graph for temperature")
         database_humidity = dbhandler.read_humidity(db)
         database_humidity = [list(row) for row in database_humidity]
         print(database_humidity)
         db.close()
-        
+
         hum, time = map(list, zip(*database_humidity))
         plotWidget = pg.plot(title="Humidity history")
         plotWidget.plot(time, hum)
-        
+
 
     def periodic_task(self):
+        '''periodic_task : function which checks if the values have exceeded the limits every 15 secs'''
         sensor_periodic()
-        
+
         read_data_list = get_sensor_data()
         temp = read_data_list[0]
         humidity = read_data_list[1]
@@ -149,28 +150,28 @@ class mywindow(QtWidgets.QDialog):
         self.ui.lcd_temp.repaint()
         self.ui.lcd_humidity.display(humidity)
         self.ui.lcd_humidity.repaint()
-        
-        
+
+
         print("Limit check")
         try:
                 temp_limit = float(self.ui.lineedit_maxtemp.text())
                 print(temp_limit)
-                
+
         except:
                 print("temp limit not specified")
                 temp_limit = 100000
-                
+
         try:
-                hum_limit = float(self.ui.lineedit_maxhum.text()) 
+                hum_limit = float(self.ui.lineedit_maxhum.text())
                 print(hum_limit)
-                
+
         except:
                 print("humidity limit not specified")
                 hum_limit = 100000
-                
-                
-               
-                
+
+
+
+
         if temp>temp_limit and humidity > hum_limit:
                 print("temp and humidity over limit")
                 self.ui.alarm.setText("Temp and humidity exceeded limit")
@@ -183,25 +184,16 @@ class mywindow(QtWidgets.QDialog):
         else:
                 self.ui.alarm.setText(" ")
 
-        
-        
-                
 
-
-
-
-   
-
-  
 def main():
-    
+
 
     app = QtWidgets.QApplication([])
     application = mywindow()
     application.show()
     app.exec() # to execute the application
 
-    
+
 if __name__ == '__main__':
     main()
 

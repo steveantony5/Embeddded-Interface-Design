@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+__author__ = "Sorabh Gandhi"
+
 import MySQLdb 
 import time
 
