@@ -17,35 +17,43 @@ pin = 22
 
 def get_sensor_data():
     '''get_sensor_data : gets the immediate reading from sensor'''
-    h_data, t_data = Adafruit_DHT.read_retry(sensor, pin)
-    t_data = t_data * 9/5.0 + 32
-    current_time = int(time.time())
-    data = [t_data, h_data, current_time]
-    return data
+    
+    try:
+        h_data, t_data = Adafruit_DHT.read_retry(sensor, pin,retries = 3, delay_seconds=.1)
+        print(h_data)
+        print(t_data)
+        t_data = t_data * 9/5.0 + 32
+        current_time = int(time.time())
+        data = [t_data, h_data, current_time]
+        return data
+    
+    except:
+        print("Error on sensor")
+        return [-1000, -1000, 0]
 
 def sensor_periodic():
     '''sensor_periodic : the 15 sec periodic task which reads sensor data'''
     # create a database connection
     db_dump = dbhandler.create_connection()
 
-    #project_table = CREATE TABLE IF NOT EXISTS sensordata(temperature float, humidity float, ttime TIME)
-
     # Create table
     dbhandler.create_table(db_dump)
 
-    humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
-    temperature = temperature * 9/5.0 + 32
-    my_time = int(time.time())
-    data = (temperature, humidity, my_time)
-    dbhandler.insert_data(db_dump, data)
-    db_dump.commit()
-
-
+    humidity, temperature = Adafruit_DHT.read_retry(sensor, pin,retries = 3, delay_seconds=.1)
+    
     if humidity is not None and temperature is not None:
-            print('Temp={0:0.1f}*  Humidity={1:0.1f}%'.format(temperature, humidity))
+        print('Temp={0:0.1f}*  Humidity={1:0.1f}%'.format(temperature, humidity))
+            
+        temperature = temperature * 9/5.0 + 32
+        my_time = int(time.time())
+        data = (temperature, humidity, my_time)
+        dbhandler.insert_data(db_dump, data)
+        db_dump.commit()
     else:
-            print('Failed to get reading. Try again!')
-            sys.exit(1)
+        print('Failed to get reading. Try again!')
+            
+    
+            
     db_dump.close()
 
 
@@ -71,6 +79,11 @@ class mywindow(QtWidgets.QDialog):
         self.ui.pushButton_tempgraph.clicked.connect(self.show_temp_graph)
 
         self.ui.pushButton_humgraph.clicked.connect(self.show_hum_graph)
+        
+        db_dump = dbhandler.create_connection()
+        c = db_dump.cursor()
+        c.execute("DROP TABLE IF EXISTS sensordb.sensordata")
+        db_dump.close()
 
 
 
@@ -81,55 +94,73 @@ class mywindow(QtWidgets.QDialog):
         '''refresh : function which updates the status line with immediate reading when refresh button is pressed'''
         print("Display update")
         read_data_list = get_sensor_data()
+        print(read_data_list)
 
         temp = read_data_list[0]
         humidity = read_data_list[1]
         timestamp = read_data_list[2]
 
-        if self.ui.checkBox_temp.isChecked():
-            print("Celcius display")
-            temp = (temp -  32) * 5/9
+        if timestamp!=0:
+            if self.ui.checkBox_temp.isChecked():
+                print("Celcius display")
+                temp = (temp -  32) * 5/9
 
-        self.ui.lineEdit_ts.setText(str(timestamp))
-        self.ui.lcd_temp.display(temp)
-        self.ui.lcd_temp.repaint()
-        self.ui.lcd_humidity.display(humidity)
-        self.ui.lcd_humidity.repaint()
+            self.ui.lineEdit_ts.setText(str(timestamp))
+            self.ui.lcd_temp.display(temp)
+            self.ui.lcd_temp.repaint()
+            self.ui.lcd_humidity.display(humidity)
+            self.ui.lcd_humidity.repaint()
+            
+        else:
+            temp = "ERROR"
+            humidity = "ERROR"
+            self.ui.lineEdit_ts.setText(str(timestamp))
+            self.ui.lcd_temp.display(temp)
+            self.ui.lcd_temp.repaint()
+            self.ui.lcd_humidity.display(humidity)
+            self.ui.lcd_humidity.repaint()
 
     def show_temp_graph(self):
         '''show_temp_graph : function to display graph of last 10 temperature reading'''
         db = dbhandler.create_connection()
         print("Display graph for temperature")
         database_temp = dbhandler.read_temperature(db)
-        database_temp = [list(row) for row in database_temp]
-        print(database_temp)
+        
         db.close()
+        print(database_temp)
+
+        if database_temp!=():
+            database_temp = [list(row) for row in database_temp]
+            print(database_temp)
+            temp, time = map(list, zip(*database_temp))
+            if self.ui.checkBox_temp.isChecked():
+                print("Celcius display")
+                new_temp = [((t -  32) * 5/9) for t in temp]
+                temp = new_temp.copy()
+                print(temp)
 
 
-        temp, time = map(list, zip(*database_temp))
-        if self.ui.checkBox_temp.isChecked():
-            print("Celcius display")
-            new_temp = [((t -  32) * 5/9) for t in temp]
-            temp = new_temp.copy()
-            print(temp)
-
-
-        plotWidget = pg.plot(title="Temperature history")
-        plotWidget.plot(time, temp)
+            plotWidget = pg.plot(title="Temperature history")
+            plotWidget.plot(time, temp)
 
 
     def show_hum_graph(self):
         '''show_hum_graph : function to display graph of last 10 humidity reading'''
         db = dbhandler.create_connection()
-        print("Display graph for temperature")
+        print("Display graph for humidity")
         database_humidity = dbhandler.read_humidity(db)
-        database_humidity = [list(row) for row in database_humidity]
-        print(database_humidity)
+        
+        
         db.close()
+        print(database_humidity)
 
-        hum, time = map(list, zip(*database_humidity))
-        plotWidget = pg.plot(title="Humidity history")
-        plotWidget.plot(time, hum)
+        if database_humidity!=():
+            
+            database_humidity = [list(row) for row in database_humidity]
+            print(database_humidity)
+            hum, time = map(list, zip(*database_humidity))
+            plotWidget = pg.plot(title="Humidity history")
+            plotWidget.plot(time, hum)
 
 
     def periodic_task(self):
@@ -141,48 +172,61 @@ class mywindow(QtWidgets.QDialog):
         humidity = read_data_list[1]
         timestamp = read_data_list[2]
 
-        if self.ui.checkBox_temp.isChecked():
-            print("Celcius display")
-            temp = (temp -  32) * 5/9
+        if timestamp!=0:
+            if self.ui.checkBox_temp.isChecked():
+                print("Celcius display")
+                temp = (temp -  32) * 5/9
 
-        self.ui.lineEdit_ts.setText(str(timestamp))
-        self.ui.lcd_temp.display(temp)
-        self.ui.lcd_temp.repaint()
-        self.ui.lcd_humidity.display(humidity)
-        self.ui.lcd_humidity.repaint()
+            self.ui.lineEdit_ts.setText(str(timestamp))
+            self.ui.lcd_temp.display(temp)
+            self.ui.lcd_temp.repaint()
+            self.ui.lcd_humidity.display(humidity)
+            self.ui.lcd_humidity.repaint()
+            
+            print("Limit check")
+            try:
+                    temp_limit = float(self.ui.lineedit_maxtemp.text())
+                    print(temp_limit)
 
+            except:
+                    print("temp limit not specified")
+                    temp_limit = 100000
 
-        print("Limit check")
-        try:
-                temp_limit = float(self.ui.lineedit_maxtemp.text())
-                print(temp_limit)
+            try:
+                    hum_limit = float(self.ui.lineedit_maxhum.text())
+                    print(hum_limit)
 
-        except:
-                print("temp limit not specified")
-                temp_limit = 100000
-
-        try:
-                hum_limit = float(self.ui.lineedit_maxhum.text())
-                print(hum_limit)
-
-        except:
-                print("humidity limit not specified")
-                hum_limit = 100000
-
-
+            except:
+                    print("humidity limit not specified")
+                    hum_limit = 100000
 
 
-        if temp>temp_limit and humidity > hum_limit:
-                print("temp and humidity over limit")
-                self.ui.alarm.setText("Temp and humidity exceeded limit")
-        elif temp > temp_limit:
-                print("temp over limit")
-                self.ui.alarm.setText("Temp exceeded limit")
-        elif humidity > hum_limit:
-                print("humidity over limit")
-                self.ui.alarm.setText("humidity exceeded limit")
+
+
+            if temp>temp_limit and humidity > hum_limit:
+                    print("temp and humidity over limit")
+                    self.ui.alarm.setText("Temp and humidity exceeded limit")
+            elif temp > temp_limit:
+                    print("temp over limit")
+                    self.ui.alarm.setText("Temp exceeded limit")
+            elif humidity > hum_limit:
+                    print("humidity over limit")
+                    self.ui.alarm.setText("humidity exceeded limit")
+            else:
+                    self.ui.alarm.setText(" ")
+                
         else:
-                self.ui.alarm.setText(" ")
+            temp = "ERROR"
+            humidity = "ERROR"
+            self.ui.lineEdit_ts.setText(str(timestamp))
+            self.ui.lcd_temp.display(temp)
+            self.ui.lcd_temp.repaint()
+            self.ui.lcd_humidity.display(humidity)
+            self.ui.lcd_humidity.repaint()
+            self.ui.alarm.setText("Check if the sensor is properly connected")
+
+
+        
 
 
 def main():

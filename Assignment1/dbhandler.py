@@ -24,7 +24,7 @@ def create_table(conn):
     """
     try:
         c = conn.cursor()
-        #c.execute("DROP TABLE sensordata")
+        
         c.execute("CREATE TABLE IF NOT EXISTS sensordata(id int NOT NULL AUTO_INCREMENT, temperature float, humidity float, ttime INTEGER, PRIMARY KEY (id))")
     except Error as e:
         print(e)
@@ -46,18 +46,30 @@ def read_temperature(conn):
     :param conn: Connection object
     """
     cur = conn.cursor()
-    cur.execute("select temperature,ttime from sensordata order by id desc limit 10")
-    output = cur.fetchall()
+    stmt = "SHOW TABLES LIKE 'sensordata'"
+    cur.execute(stmt)
+    result = cur.fetchone()
+    if result:
+        cur.execute("select temperature,ttime from sensordata order by id desc limit 10")
+        output = cur.fetchall()
     
-    return output
+        return output
+    else:
+        return ()
     
 def read_humidity(conn):
     """ Reads last 10 humidity record from sensordata table
     :param conn: Connection object
     """
     cur = conn.cursor()
-    cur.execute("select humidity,ttime from sensordata order by id desc limit 10")
-    output = cur.fetchall()
+    stmt = "SHOW TABLES LIKE 'sensordata'"
+    cur.execute(stmt)
+    result = cur.fetchone()
+    if result:
+        cur.execute("select humidity,ttime from sensordata order by id desc limit 10")
+        output = cur.fetchall()
     
-    return output
+        return output
+    else:
+        return ()
 
