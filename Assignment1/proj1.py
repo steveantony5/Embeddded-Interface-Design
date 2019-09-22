@@ -6,7 +6,51 @@ import pyqtgraph as pg
 import numpy as np
 import  random
 import dbhandler
-import sensorpoll
+import sys
+import time
+
+import Adafruit_DHT
+
+
+sensor = 22
+pin = 22
+
+def get_sensor_data():
+    h_data, t_data = Adafruit_DHT.read_retry(sensor, pin)
+    t_data = t_data * 9/5.0 + 32
+    current_time = int(time.time())
+    data = [t_data, h_data, current_time]
+    return data
+    
+def sensor_periodic():
+    # create a database connection
+    db = dbhandler.create_connection()
+
+    #project_table = CREATE TABLE IF NOT EXISTS sensordata(temperature float, humidity float, ttime TIME)
+
+    # Create table
+    dbhandler.create_table(db)
+
+    # Try to grab a sensor reading.  Use the read_retry method which will retry up
+    # to 15 times to get a sensor reading (waiting 2 seconds between each retry).
+    humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
+    temperature = temperature * 9/5.0 + 32
+    my_time = int(time.time())
+    data = (temperature, humidity, my_time)
+    dbhandler.insert_data(db, data)
+    db.commit()
+        
+
+    # Note that sometimes you won't get a reading and
+    # the results will be null (because Linux can't
+    # guarantee the timing of calls to read the sensor).
+    # If this happens try again!
+    if humidity is not None and temperature is not None:
+            print('Temp={0:0.1f}*  Humidity={1:0.1f}%'.format(temperature, humidity))
+    else:
+            print('Failed to get reading. Try again!')
+            sys.exit(1)
+    db.close()
 
 
 #inheriting mywindow class from the class QDialog
@@ -17,7 +61,7 @@ class mywindow(QtWidgets.QDialog):
         self.ui.setupUi(self) #calling the function generated in the .ui
 
         self._update_timer = QtCore.QTimer()
-        self._update_timer.timeout.connect(self.check_limit)
+        self._update_timer.timeout.connect(self.periodic_task)
         self._update_timer.start(15000) # milliseconds
         
         self.ui.lineedit_maxtemp.setText("30");
@@ -86,8 +130,9 @@ class mywindow(QtWidgets.QDialog):
         plotWidget.plot(time, hum)
         
 
-    def check_limit(self):
-            
+    def periodic_task(self):
+        sensor_periodic()
+        
         read_data_list = sensorpoll.get_sensor_data()
         temp = read_data_list[0]
         humidity = read_data_list[1]
