@@ -7,9 +7,6 @@ import time
 
 def create_connection():
     """ create a database connection to the MYSQL database
-        specified by db_file
-    :param db_file: database file
-    :return: Connection object or None
     """
     conn = None
     try:
@@ -22,10 +19,8 @@ def create_connection():
  
  
 def create_table(conn):
-    """ create a table from the create_table_sql statement
+    """ create a table in the MYSQL database
     :param conn: Connection object
-    :param create_table_sql: a CREATE TABLE statement
-    :return:
     """
     try:
         c = conn.cursor()
@@ -36,10 +31,9 @@ def create_table(conn):
  
  
 def insert_data(conn, data):
-    """Create a new project into the projects table
-    :param conn:
-    :param project:
-    :return: project id
+    """Inserts new record in my sensordata table
+    :param conn: Connection object
+    :param data: temperature, humidity and timestamp data to be inserted
     """
     sql = """INSERT INTO sensordata(temperature, humidity, ttime)
             VALUES (%s, %s, %s)"""
@@ -48,6 +42,9 @@ def insert_data(conn, data):
     cur.execute(sql, data)
     
 def read_temperature(conn):
+    """ Reads last 10 temperature record from sensordata table
+    :param conn: Connection object
+    """
     cur = conn.cursor()
     cur.execute("select temperature,ttime from sensordata order by id desc limit 10")
     output = cur.fetchall()
@@ -55,6 +52,9 @@ def read_temperature(conn):
     return output
     
 def read_humidity(conn):
+    """ Reads last 10 humidity record from sensordata table
+    :param conn: Connection object
+    """
     cur = conn.cursor()
     cur.execute("select humidity,ttime from sensordata order by id desc limit 10")
     output = cur.fetchall()

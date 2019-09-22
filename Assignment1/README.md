@@ -8,8 +8,9 @@ This is the first project in Embedded Interface design course offered at CU Boul
   - Steve Antony Xavier Kenndy
 
 ### Project Work
-Steve Antony Xavier Kenndy - QT Design and PyQT graph
-Sorabh Gandhi - Temperature polling, My SQL Database
+1.) Steve Antony Xavier Kenndy - QT Design and PyQT graph
+
+2.)Sorabh Gandhi - Temperature polling, My SQL Database
 
 ### Installation
 Install all the dependencies to run this project. Follow the installation instructions given below,
@@ -42,6 +43,7 @@ $ sudo mysql -u root -p
 
 #### Note
 1.) To plot graph, we have used PyQT graph with the approval of the instructor
+
 2.) We have also completed the extra credit part in the PyQT GUI.
 
 
