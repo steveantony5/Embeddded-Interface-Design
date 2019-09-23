@@ -1,6 +1,14 @@
 #!/usr/bin/python3
 
-__author__ = "Sorabh Gandhi"
+'''**
+ * @\file	dbhandler.py
+ * @\author	Sorabh Gandhi
+ * @\brief	This file contains the API to perform operations in MYSQL DB 
+ * @\date	09/20/2019
+ *
+ * @\Reference: https://pimylifeup.com/raspberry-pi-mysql/
+ *
+ *'''
 
 import MySQLdb 
 import time
