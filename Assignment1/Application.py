@@ -50,6 +50,7 @@ import Adafruit_DHT
 sensor = 22
 pin = 22
 
+counter = 0
 def get_sensor_data():
     '''get_sensor_data : gets the immediate reading from sensor'''
     
@@ -90,6 +91,12 @@ def sensor_periodic():
     
             
     db_dump.close()
+    global counter 
+    counter = counter + 1
+    print("counter")
+    print(counter)
+    if counter == 30:
+        exit()
 
 
 #inheriting mywindow class from the class QDialog
@@ -176,6 +183,12 @@ class mywindow(QtWidgets.QDialog):
 
 
             plotWidget = pg.plot(title="Temperature history")
+            
+            if self.ui.checkBox_temp.isChecked():
+                plotWidget.setLabel('left', 'Temperature', units='C')
+            else:
+                plotWidget.setLabel('left', 'Temperature', units='F')
+            plotWidget.setLabel('bottom', 'Time')
             plotWidget.plot(time, temp)
 
 
@@ -195,6 +208,8 @@ class mywindow(QtWidgets.QDialog):
             print(database_humidity)
             hum, time = map(list, zip(*database_humidity))
             plotWidget = pg.plot(title="Humidity history")
+            plotWidget.setLabel('left', 'Humidity', units='%')
+            plotWidget.setLabel('bottom', 'Time')
             plotWidget.plot(time, hum)
 
 
