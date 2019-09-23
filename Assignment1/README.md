@@ -14,8 +14,11 @@ This is the first project in Embedded Interface design course offered at CU Boul
 
 ### Hardware Setup
 1.) Connect the 1st Pin of DHT to 3.3V supply pin in Raspberry Pi
+
 2.) Connect the 2nd Pin of DHT to 15th Pin (GPIO 22) in Raspberry Pi
+
 3.) Connect the 3rd Pin of DHT to GND pin in Raspberry Pi
+
 4.) Connect a 1k resistor between 1st and the 2nd Pin of DHT
 
 ### Installation
