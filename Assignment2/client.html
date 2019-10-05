@@ -1,0 +1,163 @@
+
+<!doctype html>
+<html>
+  <head>
+    <title>Buffs Sensors</title>
+    <meta charset="utf-8" />
+    <style type="text/css">
+      body {
+        text-align: center;
+        min-width: 500px;
+      }
+    </style>
+    <script src="http://code.jquery.com/jquery.min.js"></script>
+    <script>
+ 
+      // log function
+      log = function(data){
+        $("div#terminal").prepend("</br>" +data);
+        console.log(data);
+      };
+ 
+      $(document).ready(function () {
+        $("div#message_details").hide()
+ 
+        var ws;
+ 
+        $("#open").click(function(evt) {
+          evt.preventDefault();
+ 
+          var host = $("#host").val();
+          var port = $("#port").val();
+          var uri = $("#uri").val();
+ 
+          // create websocket instance
+          ws = new WebSocket("ws://" + host + ":" + port + uri);
+           
+          // Handle incoming websocket message callback
+          ws.onmessage = function(evt) 
+          {
+            log("Message Received: " + evt.data)
+            var data = evt.data.split(" ");
+            $("#Temperature").value(data[1])
+            $("#Humidity").value(data[2])
+            log(data[1])
+            log(data[2])
+                
+           };
+ 
+          // Close Websocket callback
+          ws.onclose = function(evt) {
+            log("***Connection Closed***");
+            alert("Connection close");
+            $("#host").css("background", "#ff0000"); 
+            $("#port").css("background", "#ff0000"); 
+            $("#uri").css("background",  "#ff0000");
+            $("div#message_details").empty();
+ 
+            };
+ 
+          // Open Websocket callback
+          ws.onopen = function(evt) { 
+            $("#host").css("background", "#00ff00"); 
+            $("#port").css("background", "#00ff00"); 
+            $("#uri").css("background", "#00ff00");
+            $("div#message_details").show();
+            log("***Connection Opened***");
+          };
+        });
+ 
+        // Send websocket message function
+        $("#send").click(function(evt)
+        {
+            log("Sending Message: "+$("#message").val());
+            ws.send($("#message").val());
+        });
+        
+        // Send websocket message function
+        $("#read").click(function(evt)
+        {
+            log("Sending Temperature/Humidity request: ");
+            ws.send(("sensor"));
+        });
+        
+        // Send websocket message function
+        $("#Database").click(function(evt)
+        {
+            log("Sending Temperature/Humidity last database request: ");
+            ws.send(("last db readings"));
+        });
+        
+        // Send websocket message function
+        $("#Database_temp").click(function(evt)
+        {
+            log("Sending Temperature history request: ");
+            ws.send(("temp history"));
+        });
+        
+        // Send websocket message function
+        $("#Database_hum").click(function(evt)
+        {
+            log("Sending Humidity history request: ");
+            ws.send(("humidity history"));
+        });
+        
+        // Send websocket message function
+        $("#graph_temp").click(function(evt)
+        {
+            log("Sending Temperature graph request: ");
+            ws.send(("temp graph"));
+        });
+        
+        // Send websocket message function
+        $("#graph_hum").click(function(evt)
+        {
+            log("Sending Humidity graph request: ");
+            ws.send(("Hum graph"));
+        });
+        
+       
+        
+        
+ 
+      });
+    </script>
+  </head>
+ 
+  <body>
+    <h1>WebSockets Hello World</h1>
+    <div id="connection_details">
+      <label for="host">host:</label>
+      <input type="text" id="host" value="localhost" style="background:#ff0000;"/><br />
+      <label for="port">port:</label>
+      <input type="text" id="port" value="8888" style="background:#ff0000;"/><br />
+      <label for="uri">uri:</label>
+      <input type="text" id="uri" value="/ws" style="background:#ff0000;"/><br />
+      <input type="submit" id="open" value="open" />
+    </div>
+    <div id="message_details">
+        </br></br>
+        <label for="message">message:</label>
+        <input type="text" id="message" value="Hello World!"/><br />
+        <input type="submit" id="send" value="send" />
+    </div>
+    <div id="display">
+        </br></br>
+        <label for="Temperature">temperature:</label>
+        <input type="text" id="Temperature" value=32.34><br />
+        <label for="Humidity">humidity:</label>
+        <input type="text" id="Humidity" value=22.34><br />
+        <input type="submit" id="read" value="Get sensor readings" /><br />
+        <input type="submit" id="Conv" value="F to C" /><br />
+        <input type="submit" id="Database" value="Database readings" /><br />
+        <input type="submit" id="Database_temp" value="Temperature History" />
+        <input type="submit" id="Database_hum" value="Humidity History" /><br />
+        <input type="submit" id="graph_temp" value="Graph temperature" /><br />
+        <input type="submit" id="graph_hum" value="Graph humidity" /><br />
+        
+    </div>
+    <div id="terminal">
+        
+    </div>
+  </body>
+</html>
