@@ -167,6 +167,40 @@
                         order = 0;
                     }
                 }
+                else if(FIELD == "graph")
+                {
+                    log("receiving hum history from app");
+                    log(data)
+                    var chart = new CanvasJS.Chart("chartContainer", {
+                    animationEnabled: true,
+                    theme: "light2",
+                    title:
+                    {
+                            text: "Humidity Plot"
+                    },
+                    axisY:
+                    {
+                            includeZero: false
+                    },
+                    data: 
+                    [{
+                            type: "line",
+                            dataPoints: [
+                                    { y: data[0] },
+                                    { y: data[1] },
+                                    { y: data[2] },
+                                    { y: data[3] },
+                                    { y: data[4] },
+                                    { y: data[5] },
+                                    { y: data[6] },
+                                    { y: data[7] },
+                                    { y: data[8] },
+                                    { y: data[9] }
+                            ]
+                    }]
+                    });
+                    chart.render();
+                }
 
                 
             
@@ -366,6 +400,14 @@
                 log("Sending Humidity history request to node ");
                 ws_n.send(("get_humidity"));
             });
+
+            // Send Tornado message function
+            $("#graph_button").click(function(evt)
+            {
+                FIELD = "graph";
+                log("Sending humidity graph request to python app ");
+                ws.send(("humidity history"));
+            });
             
 
         });
@@ -387,6 +429,10 @@
         <input type="submit" id="read" value="Get sensor readings" /><br />
         <input type="checkbox" id="Conv" value="F to C" /> Farenheit to Celcius<br />
         <input type="submit" id="Database" value="Database readings" /><br />
+
+        <input type="button" id="graph_button" value="graph display" /><br />
+
+        
         <input type="submit" id="Database_hum_app" value="Humidity History app" />
         <p id="showData_py"></p>
         <label for="Start time Tornado Server">Start time Tornado Server:</label>
@@ -411,5 +457,9 @@
     <div id="terminal">
         
     </div>
+
+    <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+
   </body>
 </html>
