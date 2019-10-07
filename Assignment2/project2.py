@@ -149,7 +149,7 @@ class mywindow(QtWidgets.QDialog):
         
         db_dump = dbhandler.create_connection()
         c = db_dump.cursor()
-        c.execute("DELETE *FROM sensordata")
+        c.execute("DELETE FROM sensordata")
         db_dump.close()
 
 
