@@ -4,7 +4,7 @@
                  one thread runs Pyqt GUI and another thread runs Tornado server
 '''
 
-
+''' Includes '''
 from PyQt5 import QtWidgets, QtGui,QtCore
 from mydesign import Ui_Dialog #importing the generated python class from.ui
 from PyQt5.QtWidgets import QTableWidgetItem
@@ -28,9 +28,11 @@ import socket
 
 #Tornado server
 class WSHandler(tornado.websocket.WebSocketHandler):
+    '''function when any new client establishes connection'''
     def open(self):
         print('new connection')
       
+    '''function triggered when any message received from client'''
     def on_message(self, message):
         print('message received:  %s' % message)
         
@@ -50,7 +52,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
                 self.write_message(temp)
                 self.write_message(humidity)
             
-        #when client requests humidity last 10 data
+        #when client requests humidity for last 10 data
         elif message == "humidity history":
             db = dbhandler.create_connection()
             database_humidity = dbhandler.get_only_humidity(db)
@@ -65,7 +67,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
                 self.write_message(str(database_humidity))
             
             
- 
+    '''function triggered when client closes'''
     def on_close(self):
         print('connection closed')
  
@@ -82,7 +84,6 @@ pin = 22
 counter = 0
 def get_sensor_data():
     '''get_sensor_data : gets the immediate reading from sensor'''
-    
     try:
         h_data, t_data = Adafruit_DHT.read_retry(sensor, pin,retries = 3, delay_seconds=.1)
         print(h_data)
@@ -155,11 +156,6 @@ class mywindow(QtWidgets.QDialog):
         c = db_dump.cursor()
         c.execute("DELETE FROM sensordata")
         db_dump.close()
-
-
-
-
-
 
     def refresh(self):
         '''refresh : function which updates the status line with immediate reading when refresh button is pressed'''
@@ -304,7 +300,7 @@ class mywindow(QtWidgets.QDialog):
             self.ui.lcd_humidity.repaint()
             self.ui.alarm.setText("Check if the sensor is properly connected")
 
-
+'''Thread handler for Tornado Server'''
 def server():
     asyncio.set_event_loop(asyncio.new_event_loop())
     application_1 = tornado.web.Application([(r'/ws', WSHandler),])
