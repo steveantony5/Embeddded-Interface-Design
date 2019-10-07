@@ -95,3 +95,6 @@ kickoff_script.sh -> Script to start all the application components - server, py
 4.) http://www.tornadoweb.org/en/stable/
 
 5.) https://wiki.python.org/moin/WebServers
+
+#### Error Handling
+We have handled corner cases on sensor removal or sensor getting faulty. Proper error handling for this is included in both client and server.
