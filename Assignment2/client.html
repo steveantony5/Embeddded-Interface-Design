@@ -169,8 +169,12 @@
                 }
                 else if(FIELD == "graph")
                 {
-                    log("receiving hum history from app");
-                    log(data)
+                    log("receiving hum history from app for graph");
+                    
+                    
+                    data = JSON.parse(data);
+                    
+                    log(data[0][0])
                     var chart = new CanvasJS.Chart("chartContainer", {
                     animationEnabled: true,
                     theme: "light2",
@@ -186,16 +190,16 @@
                     [{
                             type: "line",
                             dataPoints: [
-                                    { y: data[0] },
-                                    { y: data[1] },
-                                    { y: data[2] },
-                                    { y: data[3] },
-                                    { y: data[4] },
-                                    { y: data[5] },
-                                    { y: data[6] },
-                                    { y: data[7] },
-                                    { y: data[8] },
-                                    { y: data[9] }
+                                    { y: data[0][0] },
+                                    { y: data[1][0] },
+                                    { y: data[2][0] },
+                                    { y: data[3][0] },
+                                    { y: data[4][0] },
+                                    { y: data[5][0] },
+                                    { y: data[6][0] },
+                                    { y: data[7][0] },
+                                    { y: data[8][0] },
+                                    { y: data[9][0] }
                             ]
                     }]
                     });
