@@ -119,7 +119,6 @@ def sensor_periodic():
         print('Failed to get reading. Try again!')
             
     
-            
     db_dump.close()
     global counter 
     counter = counter + 1

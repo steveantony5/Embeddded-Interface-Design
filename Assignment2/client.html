@@ -202,10 +202,7 @@
                     chart.render();
                 }
 
-                
-            
-                
-                    
+
             };
  
             // Close Tornado callback
@@ -385,7 +382,7 @@
                 ws_n.send(("get_sensor"));
             });
             
-            // Send websocket message function
+            // Send Tornado message function
             $("#Database_hum_app").click(function(evt)
             {
                 FIELD = "hum_his_app";
@@ -432,7 +429,6 @@
 
         <input type="button" id="graph_button" value="graph display" /><br />
 
-        
         <input type="submit" id="Database_hum_app" value="Humidity History app" />
         <p id="showData_py"></p>
         <label for="Start time Tornado Server">Start time Tornado Server:</label>
