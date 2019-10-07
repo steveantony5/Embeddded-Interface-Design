@@ -89,7 +89,7 @@ client.py -> server side implementation for tornado
 #### Reference
 1.) https://www.w3schools.com/nodejs/nodejs_mysql.asp
 
-2.) https://www.pubnub.com/blog/nodejs-websocket-programming-examples/Python-Tornado-HTML
+2.) https://www.pubnub.com/blog/nodejs-websocket-programming-examples/
 
 3.) https://os.mbed.com/cookbook/Websockets-Server
 
