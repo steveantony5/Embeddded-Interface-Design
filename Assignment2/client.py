@@ -18,11 +18,11 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         print 'message received:  %s' % message
         
         if message == "sensor":
-            self.write_message("buttons 23.33 23.33")
+            self.write_message("23.33")
+            self.write_message("13.33")
             
         
         elif message == "last db readings":
-            self.write_message("buttons")
             self.write_message("233.33")
             self.write_message("233.33")
             

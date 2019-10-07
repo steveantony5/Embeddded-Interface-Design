@@ -1,35 +1,45 @@
-
 <!doctype html>
 <html>
   <head>
     <title>Buffs Sensors</title>
     <meta charset="utf-8" />
-    <style type="text/css">
-      body {
-        text-align: center;
-        min-width: 500px;
-      }
+    <style>
+        th, td, p, input {
+            font:14px Verdana;
+        }
+        table, th, td 
+        {
+            border: solid 1px #DDD;
+            border-collapse: collapse;
+            padding: 2px 3px;
+            text-align: center;
+        }
+        th {
+            font-weight:bold;
+        }
     </style>
     <script src="http://code.jquery.com/jquery.min.js"></script>
     <script>
+        
+        var myBooks;
  
       // log function
       log = function(data){
-        $("div#terminal").prepend("</br>" +data);
         console.log(data);
       };
  
       $(document).ready(function () {
-        $("div#message_details").hide()
  
         var ws;
+        var FIELD;
+        var order = 0;
+        
  
-        $("#open").click(function(evt) {
-          evt.preventDefault();
+
  
-          var host = $("#host").val();
-          var port = $("#port").val();
-          var uri = $("#uri").val();
+          var host = "localhost";
+          var port =  8888;
+          var uri = "/ws";
  
           // create websocket instance
           ws = new WebSocket("ws://" + host + ":" + port + uri);
@@ -38,11 +48,107 @@
           ws.onmessage = function(evt) 
           {
             log("Message Received: " + evt.data)
-            var data = evt.data.split(" ");
-            $("#Temperature").value(data[1])
-            $("#Humidity").value(data[2])
-            log(data[1])
-            log(data[2])
+            var data = evt.data;
+            if(FIELD == "hum_his_app")
+            {
+                var d = new Date();
+                var starttime = d.getTime();
+                
+                log("receiving hum history from app");
+                log(data)
+                
+                
+                myBooks = JSON.parse(data);     
+                
+                log(myBooks);
+                
+                        // EXTRACT VALUE FOR HTML HEADER. 
+            var col = [];
+            for (var i = 0; i < myBooks.length; i++) {
+                for (var key in myBooks[i]) {
+                    if (col.indexOf(key) === -1) {
+                        col.push(key);
+                    }
+                }
+            }
+
+            // CREATE DYNAMIC TABLE.
+            var table = document.createElement("table");
+
+            // CREATE HTML TABLE HEADER ROW USING THE EXTRACTED HEADERS ABOVE.
+
+            var tr = table.insertRow(-1);                   // TABLE ROW.
+
+            for (var i = 0; i < col.length; i++) {
+                var th = document.createElement("th");      // TABLE HEADER.
+                th.innerHTML = col[i];
+                tr.appendChild(th);
+            }
+
+            // ADD JSON DATA TO THE TABLE AS ROWS.
+            for (var i = 0; i < myBooks.length; i++) {
+
+                tr = table.insertRow(-1);
+
+                for (var j = 0; j < col.length; j++) {
+                    var tabCell = tr.insertCell(-1);
+                    tabCell.innerHTML = myBooks[i][col[j]];
+                }
+            }
+
+            // FINALLY ADD THE NEWLY CREATED TABLE WITH JSON DATA TO A CONTAINER.
+            var divContainer = document.getElementById("showData_py");
+            divContainer.innerHTML = "";
+            divContainer.appendChild(table);
+            
+            var d2 = new Date();
+            var endtime = d2.getTime();
+            var duration = endtime- starttime;
+            
+            $("#start_tornado").val(starttime);
+            $("#end_tornado").val(endtime);
+            $("#duration_tornado").val(duration);
+            
+            
+            }
+                
+            else if(FIELD == "sensor")
+             {
+                log("receiving sensor values");
+                if(order==0) 
+                {
+                    log("temperature value");
+                    log(data);
+                    
+                    
+                    if(document.getElementById("Conv").checked)
+                    {
+                        log("F TO C");
+                        data = (data - 32)* (5/9);
+                        $("#Temperature").val(data);
+                        log(data);
+                    }
+                    else
+                    {
+                        $("#Temperature").val(data);
+                        log(data);
+                    }
+                        
+                    
+                    order = order + 1;
+                }
+                else
+                {
+                    log("humidity value");
+                    log(data);
+                    $("#Humidity").val(data);
+                    order = 0;
+                }
+            }
+
+            
+        
+            
                 
            };
  
@@ -50,70 +156,183 @@
           ws.onclose = function(evt) {
             log("***Connection Closed***");
             alert("Connection close");
-            $("#host").css("background", "#ff0000"); 
-            $("#port").css("background", "#ff0000"); 
-            $("#uri").css("background",  "#ff0000");
+            $("#Tornado").css("background", "#ff0000"); 
+            $("#Database_hum_app").css("background", "#ff0000"); 
+            $("#read").css("background", "#ff0000"); 
             $("div#message_details").empty();
  
             };
  
           // Open Websocket callback
           ws.onopen = function(evt) { 
-            $("#host").css("background", "#00ff00"); 
-            $("#port").css("background", "#00ff00"); 
-            $("#uri").css("background", "#00ff00");
+            $("#Tornado").css("background", "#fcf874");
+            $("#Database_hum_app").css("background", "#fcf874"); 
+            $("#read").css("background", "#fcf874");  
             $("div#message_details").show();
-            log("***Connection Opened***");
+            log("***Connection Opened for tornado***");
           };
-        });
+        
+        
+        //Node server
+        
+        
+        var host_n = "localhost";
+          var port_n =  9898;
+          var uri_n = "/";
  
-        // Send websocket message function
-        $("#send").click(function(evt)
-        {
-            log("Sending Message: "+$("#message").val());
-            ws.send($("#message").val());
-        });
+          // create websocket instance
+          ws_n = new WebSocket("ws://" + host_n + ":" + port_n + uri_n);
+           
+          // Handle incoming websocket message callback
+          ws_n.onmessage = function(evt) 
+          {
+            log("Message Received: " + evt.data)
+            var data = evt.data;
+            if(FIELD == "last_db")
+            {
+                log("receiving last db values");
+                log(data);
+                data_dict = JSON.parse(data); 
+                
+                var temp = data_dict[0].temperature;
+                var hum = data_dict[0].humidity;
+                
+                if(document.getElementById("Conv").checked)
+                {
+                    log("F TO C");
+                    data_temp = (temp - 32)* (5/9);
+                    $("#Temperature").val(data_temp);
+                    log(data_temp);
+                }
+                else
+                {
+                    $("#Temperature").val(temp);
+                    log(temp);
+                }
+                
+                $("#Humidity").val(hum);
+                log(hum);
+                
+                
+                
+            }
+            
+            else if(FIELD == "hum_his_node")
+            {
+                var d = new Date();
+                var starttime = d.getTime();
+                
+                log("receiving last 10 humidity db values");
+                log(data);
+                
+                myBooks = JSON.parse(data);     
+                
+                log(myBooks);
+                
+                        // EXTRACT VALUE FOR HTML HEADER. 
+            var col = [];
+            for (var i = 0; i < myBooks.length; i++) {
+                for (var key in myBooks[i]) {
+                    if (col.indexOf(key) === -1) {
+                        col.push(key);
+                    }
+                }
+            }
+
+            // CREATE DYNAMIC TABLE.
+            var table = document.createElement("table");
+
+            // CREATE HTML TABLE HEADER ROW USING THE EXTRACTED HEADERS ABOVE.
+
+            var tr = table.insertRow(-1);                   // TABLE ROW.
+
+            for (var i = 0; i < col.length; i++) {
+                var th = document.createElement("th");      // TABLE HEADER.
+                th.innerHTML = col[i];
+                tr.appendChild(th);
+            }
+
+            // ADD JSON DATA TO THE TABLE AS ROWS.
+            for (var i = 0; i < myBooks.length; i++) {
+
+                tr = table.insertRow(-1);
+
+                for (var j = 0; j < col.length; j++) {
+                    var tabCell = tr.insertCell(-1);
+                    tabCell.innerHTML = myBooks[i][col[j]];
+                }
+            }
+
+            // FINALLY ADD THE NEWLY CREATED TABLE WITH JSON DATA TO A CONTAINER.
+            var divContainer = document.getElementById("showData");
+            divContainer.innerHTML = "";
+            divContainer.appendChild(table);
+            
+            var d2 = new Date();
+            var endtime = d2.getTime();
+            var duration = endtime- starttime;
+            
+            $("#start_soc").val(starttime);
+            $("#end_soc").val(endtime);
+            $("#duration_soc").val(duration);
+                    
+                }
+                
+                    
+               };
+ 
+          // Close Websocket callback
+          ws_n.onclose = function(evt) {
+            log("***Connection Closed***");
+            alert("Connection close");
+            $("#web_socket").css("background", "#ff0000"); 
+            $("#Database").css("background", "#ff0000"); 
+            $("#Database_hum_node").css("background", "#ff0000"); 
+            $("div#message_details").empty();
+ 
+            };
+ 
+          // Open Websocket callback
+          ws_n.onopen = function(evt) { 
+            $("#web_socket").css("background", "#00ff00");
+            $("#Database").css("background", "#00ff00"); 
+            $("#Database_hum_node").css("background", "#00ff00"); 
+            $("div#message_details").show();
+            log("***Connection Opened with websocket server***");
+          };
+        
+
         
         // Send websocket message function
         $("#read").click(function(evt)
         {
-            log("Sending Temperature/Humidity request: ");
+            FIELD = "sensor";
+            log("Sending Temperature/Humidity request to app ");
             ws.send(("sensor"));
         });
         
         // Send websocket message function
         $("#Database").click(function(evt)
         {
-            log("Sending Temperature/Humidity last database request: ");
-            ws.send(("last db readings"));
+            FIELD = "last_db";
+            log("Sending Temperature/Humidity last database request to node ");
+            ws_n.send(("get_sensor"));
         });
         
         // Send websocket message function
-        $("#Database_temp").click(function(evt)
+        $("#Database_hum_app").click(function(evt)
         {
-            log("Sending Temperature history request: ");
-            ws.send(("temp history"));
-        });
-        
-        // Send websocket message function
-        $("#Database_hum").click(function(evt)
-        {
-            log("Sending Humidity history request: ");
+            FIELD = "hum_his_app";
+            log("Sending humidity history request to python app ");
             ws.send(("humidity history"));
         });
         
         // Send websocket message function
-        $("#graph_temp").click(function(evt)
+        $("#Database_hum_node").click(function(evt)
         {
-            log("Sending Temperature graph request: ");
-            ws.send(("temp graph"));
-        });
-        
-        // Send websocket message function
-        $("#graph_hum").click(function(evt)
-        {
-            log("Sending Humidity graph request: ");
-            ws.send(("Hum graph"));
+            FIELD = "hum_his_node";
+            log("Sending Humidity history request to node ");
+            ws_n.send(("get_humidity"));
         });
         
        
@@ -121,25 +340,19 @@
         
  
       });
+      
+
+        
+
+    
     </script>
   </head>
  
   <body>
     <h1>WebSockets Hello World</h1>
     <div id="connection_details">
-      <label for="host">host:</label>
-      <input type="text" id="host" value="localhost" style="background:#ff0000;"/><br />
-      <label for="port">port:</label>
-      <input type="text" id="port" value="8888" style="background:#ff0000;"/><br />
-      <label for="uri">uri:</label>
-      <input type="text" id="uri" value="/ws" style="background:#ff0000;"/><br />
-      <input type="submit" id="open" value="open" />
-    </div>
-    <div id="message_details">
-        </br></br>
-        <label for="message">message:</label>
-        <input type="text" id="message" value="Hello World!"/><br />
-        <input type="submit" id="send" value="send" />
+      <input type="submit" id="Tornado" value="Tornado" />
+      <input type="submit" id="web_socket" value="Web socket" />
     </div>
     <div id="display">
         </br></br>
@@ -148,14 +361,29 @@
         <label for="Humidity">humidity:</label>
         <input type="text" id="Humidity" value=22.34><br />
         <input type="submit" id="read" value="Get sensor readings" /><br />
-        <input type="submit" id="Conv" value="F to C" /><br />
+        <input type="checkbox" id="Conv" value="F to C" /> Farenheit to Celcius<br />
         <input type="submit" id="Database" value="Database readings" /><br />
-        <input type="submit" id="Database_temp" value="Temperature History" />
-        <input type="submit" id="Database_hum" value="Humidity History" /><br />
-        <input type="submit" id="graph_temp" value="Graph temperature" /><br />
-        <input type="submit" id="graph_hum" value="Graph humidity" /><br />
+        <input type="submit" id="Database_hum_app" value="Humidity History app" />
+        <p id="showData_py"></p>
+        <label for="Start time Tornado Server">Start time Tornado Server:</label>
+        <input type="text" id="start_tornado" /><br />
+        <label for="End time Tornado Server">End time Tornado Server:</label>
+        <input type="text" id="end_tornado" /><br />
+        <label for="Duration Tornado Server">Duration Tornado Server in ms:</label>
+        <input type="text" id="duration_tornado" /><br />
+        
+        <input type="submit" id="Database_hum_node" value="Humidity History node" /><br />
+        <p id="showData"></p>
+        <label for="Start time Web socket Server">Start time Web socket Server:</label>
+        <input type="text" id="start_soc" /><br />
+        <label for="End time Web socket Server">End time Web socket Server:</label>
+        <input type="text" id="end_soc" /><br />
+        <label for="Duration Web socket Server">Duration Web socket Server in ms:</label>
+        <input type="text" id="duration_soc" /><br />
+        
         
     </div>
+    
     <div id="terminal">
         
     </div>
