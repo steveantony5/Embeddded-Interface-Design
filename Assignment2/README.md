@@ -1,16 +1,16 @@
-# EID Project 1
+# EID Project 2
 
 ### Introduction
-This is the first project in Embedded Interface design course offered at CU Boulder. The project includes a temperature polling, storing the data in MySQL database and displaying the temperature and humidity data in PyQT GUI.
+This is the second project in Embedded Interface design course offered at CU Boulder. The project includes temperature polling, storing the data in MySQL database, displaying the temperature and humidity data in PyQT GUI, Node JS server, Tornado webserver and HTML based webclient.
 
 ### Project Developers
   - Sorabh Gandhi
   - Steve Antony Xavier Kenndy
 
 ### Project Work
-1.) Steve Antony Xavier Kenndy - QT Design and PyQT graph
+1.) Steve Antony Xavier Kenndy - Tornado Webserver and HTML Client
 
-2.)Sorabh Gandhi - Temperature polling, My SQL Database
+2.)Sorabh Gandhi - Node.js server and table display in HTML Client
 
 ### Hardware Setup
 1.) Connect the 1st Pin of DHT to 3.3V supply pin in Raspberry Pi
@@ -34,6 +34,17 @@ $ sudo apt-get install python-mysqldb
 $ cd Adafruit_Python_DHT/
 $ sudo python3 setup.py install
 $ sudo pip3 install pyqtgraph
+$ sudo apt-get install build-essential
+$ curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.8/install.sh | bash
+$ nvm install 8.9.4
+$ wget https://nodejs.org/dist/v8.9.0/node-v8.9.0-linux-armv6l.tar.gz
+$ tar -xzf node-v8.9.0-linux-armv6l.tar.gz
+$ cd node-v6.11.1-linux-armv6l/
+$ sudo cp -R * /usr/local/
+$ npm init –y
+$ npm install mysql
+$ npm install mysql -y
+$ sudo pip3 install tornado
 ```
 
 After installing the Adafruit temperature sensor library, create a username, password and 
