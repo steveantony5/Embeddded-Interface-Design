@@ -1,3 +1,10 @@
+''' Developer : Steve Kennedy
+    Description: Runs Pyqt GUI, Tornado Server
+                 Two applications are multithreaded
+                 one thread runs Pyqt GUI and another thread runs Tornado server
+'''
+
+
 from PyQt5 import QtWidgets, QtGui,QtCore
 from mydesign import Ui_Dialog #importing the generated python class from.ui
 from PyQt5.QtWidgets import QTableWidgetItem
@@ -19,7 +26,7 @@ import tornado.web
 import socket
 
 
-
+#Tornado server
 class WSHandler(tornado.websocket.WebSocketHandler):
     def open(self):
         print('new connection')
@@ -27,6 +34,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
     def on_message(self, message):
         print('message received:  %s' % message)
         
+        #when client requests sensor data
         if message == "sensor":
             read_data_list = get_sensor_data()
             temp = read_data_list[0]
@@ -42,6 +50,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
                 self.write_message(temp)
                 self.write_message(humidity)
             
+        #when client requests humidity last 10 data
         elif message == "humidity history":
             db = dbhandler.create_connection()
             database_humidity = dbhandler.get_only_humidity(db)
@@ -54,12 +63,6 @@ class WSHandler(tornado.websocket.WebSocketHandler):
                 database_humidity = [list(row) for row in database_humidity]
                 print(database_humidity)
                 self.write_message(str(database_humidity))
-            
-        elif message == "temp graph":
-            self.write_message("temp graph add")
-            
-        elif message == "Hum graph":
-            self.write_message("Hum graph add")
             
             
  
@@ -312,6 +315,8 @@ def server():
     
     tornado.ioloop.IOLoop.instance().start()
   
+#Two applications are multithreaded
+# one thread runs Pyqt GUI and another thread runs Tornado server
 def main():
     thread = threading.Thread(target=server, args=( ))
     thread.setDaemon(True)

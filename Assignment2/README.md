@@ -5,7 +5,7 @@ This is the second project in Embedded Interface design course offered at CU Bou
 
 ### Project Developers
   - Sorabh Gandhi
-  - Steve Antony Xavier Kenndy
+  - Steve Antony Xavier Kennedy
 
 ### Project Work
 1.) Steve Antony Xavier Kenndy - Tornado Webserver and HTML Client
@@ -17,7 +17,7 @@ This is the second project in Embedded Interface design course offered at CU Bou
 
 2.) Connect the 2nd Pin of DHT to 15th Pin (GPIO 22) in Raspberry Pi
 
-3.) Connect the 3rd Pin of DHT to GND pin in Raspberry Pi
+3.) Connect the 4th Pin of DHT to GND pin in Raspberry Pi
 
 4.) Connect a 1k resistor between 1st and the 2nd Pin of DHT
 
@@ -63,8 +63,9 @@ $ sudo mysql -u root -p
 
 ### Run Steps
 ```sh
-$ python3 Application.py
+$ bash kickoff_script.sh
 ```
+	This will launch the PyQT GUI, Tornado Server and websocket-server.js
 
 #### Note
 1.) To plot graph, we have used PyQT graph with the approval of the instructor
