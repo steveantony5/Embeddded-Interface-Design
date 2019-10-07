@@ -19,6 +19,7 @@ import tornado.web
 import socket
 
 
+
 class WSHandler(tornado.websocket.WebSocketHandler):
     def open(self):
         print('new connection')
