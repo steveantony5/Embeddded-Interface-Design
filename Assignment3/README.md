@@ -88,6 +88,10 @@ websocket-server.js -> server side implementation for node.js
 
 kickoff_script.sh -> Script to start all the application components - server, pyqt, python app
 
+client.html -> Client side script and UI for web interface
+
+lambda.py -> lambda function for AWS Lambda
+
 #### Reference
 1.) https://docs.aws.amazon.com/iot/latest/developerguide/iot-gs.html
 
