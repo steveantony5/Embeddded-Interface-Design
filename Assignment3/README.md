@@ -1,16 +1,16 @@
-# EID Project 2
+# EID Project 3
 
 ### Introduction
-This is the second project in Embedded Interface design course offered at CU Boulder. The project includes temperature polling, storing the data in MySQL database, displaying the temperature and humidity data in PyQT GUI, Node JS server, Tornado webserver and HTML based webclient.
+This is the third project in Embedded Interface design course offered at CU Boulder. The project includes temperature polling, storing the data in MySQL database, displaying the temperature and humidity data in PyQT GUI, Node JS server, Tornado webserver and HTML based webclient, connecting to AWS, lambda, SNS and SQS.
 
 ### Project Developers
   - Sorabh Gandhi
   - Steve Antony Xavier Kennedy
 
 ### Project Work
-1.) Steve Antony Xavier Kenndy - Tornado Webserver and HTML Client
+1.) Steve Antony Xavier Kenndy - SQS and HTML Client
 
-2.)Sorabh Gandhi - Node.js server and table display in HTML Client
+2.)Sorabh Gandhi - MQTT, Lambda and SNS
 
 ### Hardware Setup
 1.) Connect the 1st Pin of DHT to 3.3V supply pin in Raspberry Pi
@@ -45,6 +45,9 @@ $ npm init –y
 $ npm install mysql
 $ npm install mysql -y
 $ sudo pip3 install tornado
+$ git clone https://github.com/aws/aws-iot-device-sdk-python
+$ cd aws-iot-device-sdk-python
+$ sudo python setup.py install
 ```
 
 After installing the Adafruit temperature sensor library, create a username, password and 
@@ -86,15 +89,15 @@ websocket-server.js -> server side implementation for node.js
 kickoff_script.sh -> Script to start all the application components - server, pyqt, python app
 
 #### Reference
-1.) https://www.w3schools.com/nodejs/nodejs_mysql.asp
+1.) https://docs.aws.amazon.com/iot/latest/developerguide/iot-gs.html
 
-2.) https://www.pubnub.com/blog/nodejs-websocket-programming-examples/
+2.) https://techblog.calvinboey.com/raspberrypi-aws-iot-python/
 
-3.) https://os.mbed.com/cookbook/Websockets-Server
+3.) https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-making-api-requests.html
 
-4.) http://www.tornadoweb.org/en/stable/
+4.) https://docs.aws.amazon.com/lambda/latest/dg/with-sns-example.html
 
-5.) https://wiki.python.org/moin/WebServers
+5.) https://startupnextdoor.com/adding-to-sqs-queue-using-aws-lambda-and-a-serverless-api-endpoint/
 
 #### Error Handling
 We have handled corner cases on sensor removal or sensor getting faulty. Proper error handling for this is included in both client and server.
