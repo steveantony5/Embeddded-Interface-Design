@@ -1,0 +1,310 @@
+<!-- Developer : Steve Kennedy
+     Description : Client which connects to Tornado server and Web socket server
+                   Tornado connects to port 8888
+                   Web socket connects to port 9898
+-->
+
+
+<!doctype html>
+<html>
+  <head>
+    <title>Buffs Sensors</title>
+    <meta charset="utf-8" />
+    <style type="text/css"> 
+
+        body 
+        {
+            text-align: center;
+            min-width: 500px;
+        }
+        table, td {
+          border: 1px solid black;
+        }
+    </style>
+    
+    <script src="http://code.jquery.com/jquery.min.js"></script>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.553.0.min.js"></script>
+    <script>
+
+        var mytable;
+         $(document).ready(function ()
+        {
+
+        $("#SQS_single").click(function(evt)
+        {
+            console.log("SQS single");
+            sqs.receiveMessage(params, function(err, data_s) {
+              if (err) 
+            {   
+                console.log(err, err.stack); // an error occurred
+                console.log("No messages");
+            }
+              
+              else
+              {
+
+                   console.log(data_s);           // successful response
+            
+
+                    
+                   if(data_s.Messages.length===0)
+                    {
+                        console.log("No Messages");
+                        return;
+                    }
+                    else
+                    {
+
+
+                        var mytable_raw = data_s.Messages[0].Body; 
+
+                        mytable = JSON.parse(mytable_raw);
+        
+                        console.log(mytable);
+                
+                        // CREATE DYNAMIC TABLE.
+                        var table_elt = document.getElementById("myTable");
+                        // CREATE HTML TABLE HEADER ROW USING THE EXTRACTED HEADERS ABOVE.
+                        // TABLE ROW.
+                        var row = table_elt.insertRow(table_elt.length);
+                        var cell1 = row.insertCell(0);
+                        var cell2 = row.insertCell(1); 
+                        var cell3 = row.insertCell(2);  
+
+                        cell1.innerHTML = mytable.timestamp;
+                        if(document.getElementById('Conv').checked === false)
+                        {
+                            cell2.innerHTML = mytable.temperature;
+                        }
+                        else
+                        {
+                            cell2.innerHTML = (parseFloat(mytable.temperature)-32) * (5/9);
+                        }
+                        
+                        cell3.innerHTML = mytable.humidity;               
+                            
+                            
+
+                        var params_del = {
+                          QueueUrl: 'https://sqs.us-east-1.amazonaws.com/516035883487/Steve_queue', /* required */
+                          ReceiptHandle: data_s.Messages[0].ReceiptHandle /* required */
+                        };
+
+                        
+
+                        sqs.deleteMessage(params_del, function(err, data_s) 
+                        {
+                          if (err) console.log(err, err.stack); // an error occurred
+                          else     console.log("Message Deleted", data_s);           // successful response
+                        });
+                    }
+                }
+
+            });
+
+
+
+
+
+        });
+
+        $("#SQS_all").click(function(evt)
+            {
+
+                
+                receive_sqs();
+                
+                console.log("SQS all");
+            });
+
+        $("#Queue_length").click(function(evt)
+            {
+                console.log("Request queue length ");
+
+                var sqsParams = {
+                AttributeNames: ['ApproximateNumberOfMessages'],
+                QueueUrl: 'https://sqs.us-east-1.amazonaws.com/516035883487/Steve_queue'
+                };
+
+                sqs.getQueueAttributes(sqsParams, function(err,data){
+                if(err)
+                {
+                    console.log(err,err.stack);
+                    context.fail(err);
+                }
+                else
+                {
+                    console.log(parseInt(data.Attributes.ApproximateNumberOfMessages));
+                    $("#Queue_length_box").val(parseInt(data.Attributes.ApproximateNumberOfMessages));
+                }
+
+
+                });
+            });
+
+
+        });
+
+         function receive_sqs() {
+          sqs.receiveMessage(params, function(err, data) {
+                  if (err) console.log(err, err.stack); // an error occurred
+                  else     
+                  {
+                  console.log(data);           // successful response
+
+                  }
+
+                  if(data.Messages.length===0)
+                    {
+                        console.log("No Messages");
+                        return;
+                    }
+                    else
+                    {
+                        var mytable_raw = data.Messages[0].Body; 
+
+                        mytable = JSON.parse(mytable_raw);
+                
+                        console.log(mytable);
+                
+                        // CREATE DYNAMIC TABLE.
+                        var table_elt = document.getElementById("myTable");
+                        // CREATE HTML TABLE HEADER ROW USING THE EXTRACTED HEADERS ABOVE.
+                        // TABLE ROW.
+                        var row = table_elt.insertRow(table_elt.length);
+                        var cell1 = row.insertCell(0);
+                        var cell2 = row.insertCell(1); 
+                        var cell3 = row.insertCell(2);  
+
+                        cell1.innerHTML = mytable.timestamp;
+                        if(document.getElementById('Conv').checked === false)
+                        {
+                            cell2.innerHTML = mytable.temperature;
+                        }
+                        else
+                        {
+                            cell2.innerHTML = (parseFloat(mytable.temperature)-32) * (5/9);
+                        }
+                        
+                        cell3.innerHTML = mytable.humidity;               
+                    
+                    }
+
+                var params_del = {
+                  QueueUrl: 'https://sqs.us-east-1.amazonaws.com/516035883487/Steve_queue', /* required */
+                  ReceiptHandle: data.Messages[0].ReceiptHandle /* required */
+                };
+
+                
+
+                sqs.deleteMessage(params_del, function(err, data) {
+                  if (err) console.log(err, err.stack); // an error occurred
+                  else     console.log("Message Deleted", data);           // successful response
+                });
+
+                  
+                 receive_sqs();
+                
+
+
+                });
+
+
+        }
+
+
+
+        AWS.config.region = 'us-east-1'; // Region
+        AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+            IdentityPoolId: 'us-east-1:a780973c-9aa7-4890-b092-833e78e42708',
+        });
+
+        var sqs = new AWS.SQS();
+        
+        var params = {
+      QueueUrl: 'https://sqs.us-east-1.amazonaws.com/516035883487/Steve_queue', /* required */
+      AttributeNames: [
+        'All' ,
+        /* more items */
+      ],
+      MaxNumberOfMessages: '1',
+      MessageAttributeNames: [
+        'All',
+        /* more items */
+      ],
+      VisibilityTimeout: '10',
+      WaitTimeSeconds: '10'
+    };
+
+    function ShowHideDiv() {
+        if(document.getElementById('Conv').checked === true)
+        {
+            console.log("Ticked");
+            var table = document.getElementById("myTable");
+            var r = 0;
+            for (var i = 1; i < document.getElementById("myTable").rows.length; i++) 
+            {
+             var row_number = document.getElementById("myTable").rows[parseInt(i,10)].cells;
+
+             var farenh = parseFloat(row_number[1].innerHTML);
+             var celcius = (farenh-32) * (5/9);
+             row_number[1].innerHTML = celcius;
+            }
+
+        }
+        else
+        {
+            console.log("unTicked");
+            var table = document.getElementById("myTable");
+            var r = 0;
+            for (var i = 1; i < document.getElementById("myTable").rows.length; i++) 
+            {
+             var row_number = document.getElementById("myTable").rows[parseInt(i,10)].cells;
+
+             var celcius = parseFloat(row_number[1].innerHTML);
+             var farenh = (celcius+32) * (9/5);
+             row_number[1].innerHTML = farenh;
+
+            }
+        }
+    }
+
+    
+ 
+    </script>
+ </head>
+ 
+ <body>
+    <h1>Buffs Temp / Humidity Device</h1>
+    <div id="display">
+        </br></br>
+        <input type="button" id="SQS_single" value="single SQS" />
+        <input type="button" id="SQS_all" value="All SQS" /><br />
+        <input type="button" id="Queue_length" value="Queue_length" />
+        <input type="input" id="Queue_length_box" /><br />
+        <input type="checkbox" id="Conv" value="F to C" onchange="ShowHideDiv()"/> Farenheit to Celcius<br />
+
+        <table id="myTable">
+             <tr>
+                 <td>Timestamp</td>
+                 <td>Temperature</td>
+                 <td>Humidity</td>
+            </tr>
+
+        </table>
+        
+
+
+
+        
+    </div>
+    
+    <div id="terminal">
+        
+    </div>
+
+    <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+
+  </body>
+</html>
