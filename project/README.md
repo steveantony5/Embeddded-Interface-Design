@@ -84,7 +84,8 @@ https://www.youtube.com/watch?v=D0iCHFXHb_g
 
 
 Note:
-To change the resolution fit to screen on VNC server 
+####To change the resolution fit to screen on VNC server 
+
 edit the follow
 /boot/config.txt
 hdmi_force_hotplug=1
