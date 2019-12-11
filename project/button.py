@@ -2,6 +2,8 @@ import AWS_voice_speech
 import time
 import RPi.GPIO as GPIO # Import Raspberry Pi GPIO library
 
+
+#runs the application if the button is pressed
 def button_callback(channel):
     print("Button was pushed!")
     AWS_voice_speech.wand_activate()
