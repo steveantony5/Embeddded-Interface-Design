@@ -65,6 +65,12 @@
                         var table_elt = document.getElementById("myTable");
                         // CREATE HTML TABLE HEADER ROW USING THE EXTRACTED HEADERS ABOVE.
                         // TABLE ROW.
+
+                        var table_entries = table_elt.length;
+                        if(table_entries > 20)
+                        {
+                          document.getElementById("myTable").deleteRow(1);
+                        }
                         var row = table_elt.insertRow(table_elt.length);
                         var cell1 = row.insertCell(0);
                         var cell2 = row.insertCell(1); 
@@ -168,9 +174,17 @@
                         mytable = JSON.parse(mytable_raw);
                 
                         console.log(mytable);
+
                 
                         // CREATE DYNAMIC TABLE.
                         var table_elt = document.getElementById("myTable");
+
+                        var table_entries = table_elt.length;
+                        if(table_entries > 20)
+                        {
+                          document.getElementById("myTable").deleteRow(1);
+                        }
+                        
                         // CREATE HTML TABLE HEADER ROW USING THE EXTRACTED HEADERS ABOVE.
                         // TABLE ROW.
                         var row = table_elt.insertRow(table_elt.length);

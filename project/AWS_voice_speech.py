@@ -1,3 +1,4 @@
+'''Includes'''
 import boto3
 import pyaudio
 import wave
@@ -7,17 +8,20 @@ import sqs_send
 import py_camera
 import time
 
+'''Function which turns on the microphone and converts voice to Text using AWS Lex'''
 def voice_to_text():
 	print("Recording")
+
+	#command to record
 	os.system('arecord -d 3 -r 16000 -f S16_LE -t wav command.wav')
 	print("processing")
 
+	#creating lex instance
+	robot = boto3.client('lex-runtime', region_name="us-east-1")
 
-	client = boto3.client('lex-runtime', region_name="us-east-1")
-
-	#convert voice to speech
+	#connection with lex robot
 	obj = wave.open('command.wav','rb')
-	response = client.post_content(
+	response = robot.post_content(
 	    botName='eidproject',
 	    botAlias='eidproject',
 	    userId='test',
@@ -26,21 +30,33 @@ def voice_to_text():
 	    inputStream=obj.readframes(96044)
 	)
 	    
+	#getting response from Lex robot
 	response_from_lex = response['message']
 	print(response_from_lex)
 	return response_from_lex
 
 
+'''function which wakes the wand and starts the entire application'''
 def wand_activate():
+
+	#need to turn the camera on if the voice was Identifio
 	if voice_to_text() == "identifio":
 		#turn on camera
 		print("label from aws")
+
+		#AWS rekognition return label for the photo
 		label = py_camera.get_label()
 		print(label)
-		time.sleep(5)
+		
+
+		#convert text to speech
 		aws_polly.text_to_voice(label)
+
+		time.sleep(5)
 		print("Microphone activated")
 		print("Say Correcto or Wrongo")
+
+		#pushes the data to SQS based on the response for the label
 
 		response = voice_to_text()
 		
