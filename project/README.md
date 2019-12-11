@@ -65,6 +65,10 @@ button.py -> Function related to button
 
 .asoundrc -> Setting up the microphone as default. Should be resent in the root folder
 
+websocket-server.js -> node.js application to read from database
+
+client.html -> html client which displays database values queried from database using node.js
+
 #### References
 
 #### AWS services
