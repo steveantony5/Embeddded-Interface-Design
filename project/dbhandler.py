@@ -10,15 +10,16 @@
  *
  *'''
 
-import MySQLdb 
+import sqlite3
+from sqlite3 import Error
 import time
 
-def create_connection():
+def create_connection(db_file):
     """ create a database connection to the MYSQL database
     """
     conn = None
     try:
-        conn = MySQLdb.connect("localhost", "gandhi", "sorabh", "sensordb")
+        conn = sqlite3.connect(db_file)
         return conn
     except Error as e:
         print(e)
@@ -33,7 +34,7 @@ def create_table(conn):
     try:
         c = conn.cursor()
         
-        c.execute("CREATE TABLE IF NOT EXISTS magicwand(id int NOT NULL AUTO_INCREMENT, correct_voice int, wrong_voice int, invalid_voice int, label VARCHAR(20), PRIMARY KEY (id))")
+        c.execute("CREATE TABLE IF NOT EXISTS magicwand(correct_voice int, wrong_voice int, invalid_voice int, label VARCHAR(20))")
     except Error as e:
         print(e)
  
@@ -44,7 +45,7 @@ def insert_data(conn, data):
     :param data: temperature, humidity and timestamp data to be inserted
     """
     sql = """INSERT INTO magicwand(correct_voice, wrong_voice, invalid_voice, label)
-            VALUES (%s, %s, %s, %s)"""
+            VALUES (?, ?, ?, ?)"""
             
     cur = conn.cursor()
     cur.execute(sql, data)
@@ -54,17 +55,12 @@ def read_data(conn):
     :param conn: Connection object
     """
     cur = conn.cursor()
-    stmt = "SHOW TABLES LIKE 'magicwand'"
-    cur.execute(stmt)
-    result = cur.fetchone()
-    if result:
-        cur.execute("select * from magicwand order by id desc limit 10")
-        output = cur.fetchall()
-        print(output)
+    cur.execute("select * from magicwand")
+    output = cur.fetchall()
+    for row in output:
+        print(row)
     
-        return output
-    else:
-        return ()
+    return output
     
 def read_humidity(conn):
     """ Reads last 10 humidity record from sensordata table
