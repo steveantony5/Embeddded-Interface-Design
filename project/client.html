@@ -1,0 +1,165 @@
+<!-- Developer : Steve Kennedy
+     Description : Client which connects to Tornado server and Web socket server
+                   Tornado connects to port 8888
+                   Web socket connects to port 9898
+-->
+
+
+<!doctype html>
+<html>
+  <head>
+    <title>Buffs Sensors</title>
+    <meta charset="utf-8" />
+    <style type="text/css"> 
+
+        body 
+        {
+            text-align: center;
+            min-width: 500px;
+        }
+      
+        th, td, p, input 
+        {
+            font:14px Verdana;
+        }
+        table, th, td 
+        {
+            border: solid 1px #DDD;
+            border-collapse: collapse;
+            padding: 2px 3px;
+            text-align: center;
+        }
+        th 
+        {
+            font-weight:bold;
+        }
+    </style>
+    <script src="http://code.jquery.com/jquery.min.js"></script>
+    <script>
+        
+        var myBooks;
+ 
+        // log function
+        log = function(data)
+        {
+            console.log(data);
+        };
+ 
+        $(document).ready(function ()
+        {     
+            
+            // connection with the Web socket server
+            var host_n = "localhost";
+            var port_n =  9898;
+            var uri_n = "/";
+     
+            // create websocket instance
+            ws_n = new WebSocket("ws://" + host_n + ":" + port_n + uri_n);
+               
+            // Handle incoming websocket message callback
+            ws_n.onmessage = function(evt) 
+            {
+                log("Message Received: " + evt.data)
+                var data = evt.data;
+                
+                log("receiving values from database");
+                log(data);
+                
+                myBooks = JSON.parse(data);     
+                
+                log(myBooks);
+                
+                // EXTRACT VALUE FOR HTML HEADER. 
+                var col = [];
+                for (var i = 0; i < myBooks.length; i++) 
+                {
+                    for (var key in myBooks[i]) 
+                    {
+                        if (col.indexOf(key) === -1) 
+                        {
+                            col.push(key);
+                        }
+                    }
+                }
+
+                // CREATE DYNAMIC TABLE.
+                var table = document.createElement("table");
+
+                // CREATE HTML TABLE HEADER ROW USING THE EXTRACTED HEADERS ABOVE.
+
+                var tr = table.insertRow(-1);                   // TABLE ROW.
+
+                for (var i = 0; i < col.length; i++) 
+                {
+                    var th = document.createElement("th");      // TABLE HEADER.
+                    th.innerHTML = col[i];
+                    tr.appendChild(th);
+                }
+
+                // ADD JSON DATA TO THE TABLE AS ROWS.
+                for (var i = 0; i < myBooks.length; i++) 
+                {
+
+                    tr = table.insertRow(-1);
+
+                    for (var j = 0; j < col.length; j++) 
+                    {
+                        var tabCell = tr.insertCell(-1);
+                        tabCell.innerHTML = myBooks[i][col[j]];
+                    }
+                }
+
+                // FINALLY ADD THE NEWLY CREATED TABLE WITH JSON DATA TO A CONTAINER.
+                var divContainer = document.getElementById("showData");
+                divContainer.innerHTML = "";
+                divContainer.appendChild(table);
+                         
+            };
+
+            // Open Websocket callback
+            ws_n.onopen = function(evt) 
+            { 
+                $("#web_socket").css("background", "#00ff00");
+                $("#Database").css("background", "#00ff00"); 
+                $("#Database_hum_node").css("background", "#00ff00"); 
+                $("div#message_details").show();
+                log("***Connection Opened with websocket server***");
+            };
+        
+        
+        
+
+            // Send websocket message function
+            $("#Database").click(function(evt)
+            {
+                log("Sending request to database for data ");
+                ws_n.send(("get_data"));
+            });
+            
+
+        });
+    </script>
+ </head>
+ 
+ <body>
+    <h1>Buffs Temp / Humidity Device</h1>
+    <div id="connection_details">
+      <input type="submit" id="web_socket" value="Web socket" />
+    </div>
+    <div id="display">
+        </br></br>
+        <input type="submit" id="Database" value="Database readings" /><br />
+
+        
+        <p id="showData"></p>
+    </div>
+    
+    <div id="terminal">
+        
+    </div>
+
+    <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+
+  </body>
+</html>
