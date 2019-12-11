@@ -34,7 +34,7 @@ def create_table(conn):
     try:
         c = conn.cursor()
         
-        c.execute("CREATE TABLE IF NOT EXISTS magicwand(correct_voice int, wrong_voice int, invalid_voice int, label VARCHAR(20))")
+        c.execute("CREATE TABLE IF NOT EXISTS magicwand(command VARCHAR(20), label VARCHAR(20))")
     except Error as e:
         print(e)
  
@@ -44,8 +44,8 @@ def insert_data(conn, data):
     :param conn: Connection object
     :param data: temperature, humidity and timestamp data to be inserted
     """
-    sql = """INSERT INTO magicwand(correct_voice, wrong_voice, invalid_voice, label)
-            VALUES (?, ?, ?, ?)"""
+    sql = """INSERT INTO magicwand(command, label)
+            VALUES (?, ?)"""
             
     cur = conn.cursor()
     cur.execute(sql, data)
