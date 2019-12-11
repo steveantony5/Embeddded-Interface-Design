@@ -67,25 +67,25 @@ button.py -> Function related to button
 
 #### References
 
-#####AWS services
+####AWS services
 AWS Documentation and Python examples
 
 https://medium.com/@likhita507/conversion-of-text-to-speech-speech-to-text-using-cloud-services-5189f508bc9
 https://www.youtube.com/watch?v=KTa1T14nkbw
 https://www.youtube.com/watch?v=PLnRzHNmcao
 
-#####Setting up microphone on Rpi
+####Setting up microphone on Rpi
 
 http://jonamiki.com/2019/07/04/sound-on-raspberry-pi-separate-speaker-and-microphone/
 
-#####PyQT Image display
+####PyQT Image display
 
 https://www.youtube.com/watch?v=D0iCHFXHb_g
 
 
 Note:
 
-####To change the resolution fit to screen on VNC server 
+###To change the resolution fit to screen on VNC server 
 
 edit the follow
 /boot/config.txt
