@@ -28,9 +28,9 @@ SOFTWARE.
  */
 
 const http = require('http');
-var mysql = require('mysql');
+const sqlite3 = require('sqlite3').verbose();
 const WebSocketServer = require('websocket').server;
-
+database = r"c:\sqlite\db\eidproject.db"
 var ret = [];
 
 //Create an http server object
@@ -45,25 +45,7 @@ const wsServer = new WebSocketServer({
 });
 
 //Create connection to the MYSQL database
-var con = mysql.createConnection({
-    
-    host: "localhost",
-    user: "gandhi",			//Specify the username
-    password: "sorabh",		//password
-    database: "sensordb",	//database name
-    port: "9898"
-});
-
-//Connect to the database and get a connection handle
-con.connect(function(err) {
-    //Check if its a valid connection
-    if (err) {
-        console.error('Error connecting: ' + err.stack);
-        return;
-    }
-    
-    console.log('Connected as id ' + con.threadId);
-});
+let db = new sqlite3.Database(database);
 
 //Contiously listen on the connected port
 wsServer.on('request', function(request) {
@@ -76,26 +58,22 @@ wsServer.on('request', function(request) {
         console.log('Received Message:', message.utf8Data);
         
 		//Check for the requested data
-        if (message.utf8Data == "get_humidity") {
-			
-			con.query("SHOW TABLES LIKE 'magicwand'", function (err, result, fields) {
-			
-			if (result) {
-				//Querry the MYSQL database to obtain last 10 humidity value
-				con.query("select * from magicwand order by id desc limit 10", function (err, result, fields) {
-					
-					//Jsonize the obtained data
-					ret = JSON.stringify(result);
-					console.log(ret);
-					
-					//Send querry results to the client
-					connection.sendUTF(ret);
-				});
-			} else {
-                connection.sendUTF('error');
-            }
+        if (message.utf8Data == "get_data") {
+		
+		db.all("select * from magicwand", function(err, allRows) {
 
-			});
+			if (err != NULL) {
+				console.log(err);
+			}
+				
+			console.log(util.inspect(allRows))
+			//Jsonize the obtained data
+			ret = JSON.stringify(allRows);
+			console.log(ret);
+					
+			//Send querry results to the client
+			connection.sendUTF(ret);
+		});
         }
 
         
