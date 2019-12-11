@@ -83,4 +83,11 @@ http://jonamiki.com/2019/07/04/sound-on-raspberry-pi-separate-speaker-and-microp
 https://www.youtube.com/watch?v=D0iCHFXHb_g
 
 
+Note:
+To change the resolution fit to screen on VNC server 
+edit the follow
+/boot/config.txt
+hdmi_force_hotplug=1
 
+hdmi_group=2
+hdmi_mode=58
