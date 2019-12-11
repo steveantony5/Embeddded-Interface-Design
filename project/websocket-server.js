@@ -50,7 +50,8 @@ var con = mysql.createConnection({
     host: "localhost",
     user: "gandhi",			//Specify the username
     password: "sorabh",		//password
-    database: "sensordb"	//database name
+    database: "sensordb",	//database name
+    port: "9898"
 });
 
 //Connect to the database and get a connection handle

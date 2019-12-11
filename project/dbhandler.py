@@ -33,7 +33,7 @@ def create_table(conn):
     try:
         c = conn.cursor()
         
-        c.execute("CREATE TABLE IF NOT EXISTS magicwand(id int NOT NULL AUTO_INCREMENT, correct_image int, wrong_image int, correct_voice int, wrong_voice int, label VARCHAR(20), PRIMARY KEY (id))")
+        c.execute("CREATE TABLE IF NOT EXISTS magicwand(id int NOT NULL AUTO_INCREMENT, correct_voice int, wrong_voice int, invalid_voice int, label VARCHAR(20), PRIMARY KEY (id))")
     except Error as e:
         print(e)
  
@@ -43,8 +43,8 @@ def insert_data(conn, data):
     :param conn: Connection object
     :param data: temperature, humidity and timestamp data to be inserted
     """
-    sql = """INSERT INTO magicwand(correct_image, wrong_image, correct_voice, wrong_voice, label)
-            VALUES (%s, %s, %s, %s, %s)"""
+    sql = """INSERT INTO magicwand(correct_voice, wrong_voice, invalid_voice, label)
+            VALUES (%s, %s, %s, %s)"""
             
     cur = conn.cursor()
     cur.execute(sql, data)
