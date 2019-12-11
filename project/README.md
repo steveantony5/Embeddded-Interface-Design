@@ -1,4 +1,5 @@
 # Magic Wand
+## 'Let's dive into our magic world'
 
 ### Introduction
 Magic Wand helps you to detect object and tell what it is using AWS. You can activate the magic wand by saying 'Identifio'.
@@ -18,6 +19,8 @@ For storing image, voice file -> AWS S3 bucket
 Queueing messges like a databse -> AWS SQS
 
 Local database -> SQLLite
+
+database querrying -> node.js
 
 Push button is provided on the wand which turns on the microphone.
 
@@ -65,6 +68,10 @@ button.py -> Function related to button
 
 .asoundrc -> Setting up the microphone as default. Should be resent in the root folder
 
+websocket-server.js -> node.js application to read from database
+
+client.html -> html client which displays database values queried from database using node.js
+
 #### References
 
 #### AWS services
@@ -84,6 +91,13 @@ https://www.youtube.com/watch?v=D0iCHFXHb_g
 
 
 Note:
+
+##### To change the resolution fit to screen on VNC server 
+
+edit the follow
+/boot/config.txt
+hdmi_force_hotplug=1
+
 
 ##### To change the resolution fit to screen on VNC server 
 
