@@ -3,10 +3,11 @@ import picamera as cam
 import boto3
 
 SOURCE_IMAgE_FILENAME = "IMG_3125.JPG"
+image = cam.PiCamera()
 
 '''Functions that activates the camera , uses AWS rekognition and gives a label'''
 def get_label():
-	image = cam.PiCamera()
+	
 	image.vflip = True
 	image.capture(SOURCE_IMAgE_FILENAME)
 

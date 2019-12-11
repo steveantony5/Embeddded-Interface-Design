@@ -9,7 +9,7 @@ import py_camera
 import time
 import dbhandler as db
 
-database = r"c:\sqlite\db\eidproject.db"
+database = r"eidproject.db"
 
 '''Function which turns on the microphone and converts voice to Text using AWS Lex'''
 def voice_to_text():
@@ -67,9 +67,9 @@ def wand_activate():
 		db.create_table(conn)
 		
 		
-		if response == "correcto":
-			sqsmsg = [{'label':label},{'command':'correcto'}]
-			data_db = ("correcto",label)
+		if response == "righto":
+			sqsmsg = [{'label':label},{'command':'righto'}]
+			data_db = ("righto",label)
 			
 			sqs_send.push_to_SQS(sqsmsg)
 

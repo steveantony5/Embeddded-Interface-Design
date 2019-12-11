@@ -66,15 +66,17 @@ class mywindow(QtWidgets.QDialog):
 
                 #have a message count for tracking percentage
                 total_messages = total_messages+1
+                
+                print("command " + data[1]['command'])
 
                 #correcto voice commands on SQS
-                if data[1]['command'] == "Correcto":
+                if data[1]['command'] == "righto":
                     print("Correcto received")
                     Image_recog_correct = Image_recog_correct +1
                     voice_cmd_correct = voice_cmd_correct +1
 
                 #wrongo voice commands on SQS
-                elif data[1]['command'] == "Wrongo":
+                elif data[1]['command'] == "wrongo":
                     print("Wrongo received")
                     voice_cmd_correct = voice_cmd_correct+1
 
@@ -84,10 +86,14 @@ class mywindow(QtWidgets.QDialog):
 
                 #unrecognized voice commands on SQS
                 else:
-                    print("Wrong voice command")
+                    print("Invalid voice command")
                     #decrement the voice correct command only if t is greater than 0
                     if voice_cmd_correct > 1:
                         voice_cmd_correct = voice_cmd_correct - 1
+                        
+                print("Voice cmd correct "+ str(voice_cmd_correct))
+                print("Image_recog_correct "+ str(Image_recog_correct))
+                print("messages "+ str(total_messages))
 
                 #calculate the percentage of Voice recognized
                 percentage_voice_recog = (voice_cmd_correct / total_messages) * 100

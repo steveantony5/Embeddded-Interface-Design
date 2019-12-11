@@ -7,7 +7,7 @@ import RPi.GPIO as GPIO # Import Raspberry Pi GPIO library
 def button_callback(channel):
     print("Button was pushed!")
     AWS_voice_speech.wand_activate()
-    time.sleep(2)
+    time.sleep(5)
 
 GPIO.setwarnings(False) # Ignore warning for now
 GPIO.setmode(GPIO.BOARD) # Use physical pin numbering

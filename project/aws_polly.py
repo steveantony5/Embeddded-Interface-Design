@@ -1,4 +1,5 @@
 import boto3
+import pygame
 
 polly_client = boto3.Session(region_name='us-east-1').client('polly')
 
@@ -12,4 +13,11 @@ def text_to_voice(text_ip):
 	file.close()
 
 	#command to play
-	os.system('aplay speech_polly.mp3')
+	#os.system('aplay speech_polly.mp3')
+	
+	
+	pygame.mixer.init()
+	pygame.mixer.music.load("speech_polly.mp3")
+	pygame.mixer.music.play()
+	while pygame.mixer.music.get_busy() == True:
+		continue
