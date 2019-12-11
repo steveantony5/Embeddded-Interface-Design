@@ -4,6 +4,8 @@ import wave
 import os
 import aws_polly
 import sqs_send
+import py_camera
+import time
 
 def voice_to_text():
 	print("Recording")
@@ -33,8 +35,10 @@ def wand_activate():
 	if voice_to_text() == "identifio":
 		#turn on camera
 		print("label from aws")
-		label = get_label()
-		text_to_voice(label)
+		label = py_camera.get_label()
+		print(label)
+		time.sleep(5)
+		aws_polly.text_to_voice(label)
 		print("Microphone activated")
 		print("Say Correcto or Wrongo")
 
@@ -42,12 +46,12 @@ def wand_activate():
 		
 		if response == "correcto":
 			sqsmsg = [{'label':label},{'command':'correcto'}]
-			push_to_SQS(sqsmsg)
+			sqs_send.push_to_SQS(sqsmsg)
 
 		elif response == "wrongo":
 			sqsmsg = [{'label':label},{'command':'wrongo'}]
-			push_to_SQS(sqsmsg)
-		else
+			sqs_send.push_to_SQS(sqsmsg)
+		else:
 			sqsmsg = [{'label':label},{'command':'invalid'}]
-			push_to_SQS(sqsmsg)
+			sqs_send.push_to_SQS(sqsmsg)
 
