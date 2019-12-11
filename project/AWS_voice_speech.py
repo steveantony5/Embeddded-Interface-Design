@@ -29,25 +29,25 @@ def voice_to_text():
 	return response_from_lex
 
 
+def wand_activate():
+	if voice_to_text() == "identifio":
+		#turn on camera
+		print("label from aws")
+		label = get_label()
+		text_to_voice(label)
+		print("Microphone activated")
+		print("Say Correcto or Wrongo")
 
-if voice_to_text() == "identifio":
-	#turn on camera
-	print("label from aws")
-	label = get_label()
-	text_to_voice(label)
-	print("Microphone activated")
-	print("Say Correcto or Wrongo")
+		response = voice_to_text()
+		
+		if response == "correcto":
+			sqsmsg = [{'label':label},{'command':'correcto'}]
+			push_to_SQS(sqsmsg)
 
-	response = voice_to_text()
-	
-	if response == "correcto":
-		sqsmsg = [{'label':label},{'command':'correcto'}]
-		push_to_SQS(sqsmsg)
-
-	elif response == "wrongo":
-		sqsmsg = [{'label':label},{'command':'wrongo'}]
-		push_to_SQS(sqsmsg)
-	else
-		sqsmsg = [{'label':label},{'command':'invalid'}]
-		push_to_SQS(sqsmsg)
+		elif response == "wrongo":
+			sqsmsg = [{'label':label},{'command':'wrongo'}]
+			push_to_SQS(sqsmsg)
+		else
+			sqsmsg = [{'label':label},{'command':'invalid'}]
+			push_to_SQS(sqsmsg)
 
