@@ -30,7 +30,7 @@ SOFTWARE.
 const http = require('http');
 const sqlite3 = require('sqlite3').verbose();
 const WebSocketServer = require('websocket').server;
-database = r"c:\sqlite\db\eidproject.db"
+
 var ret = [];
 
 //Create an http server object
@@ -45,7 +45,7 @@ const wsServer = new WebSocketServer({
 });
 
 //Create connection to the MYSQL database
-let db = new sqlite3.Database(database);
+let db = new sqlite3.Database('eidproject.db');
 
 //Contiously listen on the connected port
 wsServer.on('request', function(request) {
@@ -62,11 +62,11 @@ wsServer.on('request', function(request) {
 		
 		db.all("select * from magicwand", function(err, allRows) {
 
-			if (err != NULL) {
+			if (err) {
 				console.log(err);
 			}
 				
-			console.log(util.inspect(allRows))
+			console.log(allRows)
 			//Jsonize the obtained data
 			ret = JSON.stringify(allRows);
 			console.log(ret);
