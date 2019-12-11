@@ -89,19 +89,21 @@ class mywindow(QtWidgets.QDialog):
                     if voice_cmd_correct > 1:
                         voice_cmd_correct = voice_cmd_correct - 1
 
+                #calculate the percentage of Voice recognized
+                percentage_voice_recog = (voice_cmd_correct / total_messages) * 100
+
+                #calculate the percentage of image correct
+                precentage_image_correct = (Image_recog_correct / total_messages) * 100
+
+                #display the percentage on GUI
+                self.ui.lineEdit_image.setText(str(precentage_image_correct))
+                self.ui.lineEdit_voice.setText(str(percentage_voice_recog))
+
             except:
                 print("No more messages")
                 break
 
-        #calculate the percentage of Voice recognized
-        percentage_voice_recog = (voice_cmd_correct / total_messages) * 100
-
-        #calculate the percentage of image correct
-        precentage_image_correct = (Image_recog_correct / total_messages) * 100
-
-        #display the percentage on GUI
-        self.ui.lineEdit_image.setText(str(precentage_image_correct))
-        self.ui.lineEdit_voice.setText(str(percentage_voice_recog))
+        
 
 
 

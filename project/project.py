@@ -59,7 +59,7 @@ class Ui_Dialog(object):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
         self.pushButton.setText(_translate("Dialog", "Last clicked Image"))
-        self.pushButton_2.setText(_translate("Dialog", "Statustics"))
+        self.pushButton_2.setText(_translate("Dialog", "Statistics"))
         self.label.setText(_translate("Dialog", "% Image correct"))
         self.label_2.setText(_translate("Dialog", "% Voice correct"))
         self.label_3.setText(_translate("Dialog", "Let us dive into our magic wonderland"))
