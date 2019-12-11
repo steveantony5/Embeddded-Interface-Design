@@ -1,4 +1,5 @@
 # Magic Wand
+## 'Let's dive into our magic world'
 
 ### Introduction
 Magic Wand helps you to detect object and tell what it is using AWS. You can activate the magic wand by saying 'Identifio'.
