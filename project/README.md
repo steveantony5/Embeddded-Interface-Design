@@ -8,11 +8,16 @@ This helps to perform an analysis on how well the wand works which is being disp
 We use the following services
 
 Text to Speech -> AWS Polly
+
 Spech to Text -> AWS Lex
+
 Image Recogniztion -> AWS Rekognition
+
 For storing image, voice file -> AWS S3 bucket
+
 Queueing messges like a databse -> AWS SQS
-Local database -> MariaDB
+
+Local database -> SQLLite
 
 Push button is provided on the wand which turns on the microphone.
 
@@ -64,14 +69,17 @@ button.py -> Function related to button
 
 #####AWS services
 AWS Documentation and Python examples
+
 https://medium.com/@likhita507/conversion-of-text-to-speech-speech-to-text-using-cloud-services-5189f508bc9
 https://www.youtube.com/watch?v=KTa1T14nkbw
 https://www.youtube.com/watch?v=PLnRzHNmcao
 
 #####Setting up microphone on Rpi
+
 http://jonamiki.com/2019/07/04/sound-on-raspberry-pi-separate-speaker-and-microphone/
 
 #####PyQT Image display
+
 https://www.youtube.com/watch?v=D0iCHFXHb_g
 
 
