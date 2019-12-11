@@ -19,6 +19,8 @@ Queueing messges like a databse -> AWS SQS
 
 Local database -> SQLLite
 
+database querrying -> node.js
+
 Push button is provided on the wand which turns on the microphone.
 
 ### Project Developers
